@@ -1,3 +1,7 @@
+# kotlin-observable-js
+
+This is a fork of https://github.com/lightningkite/kotlin-observable, ported and adapted to JS platform.
+
 # kotlin-observable
 
 This package is not Android-specific, and can be used across platforms.  However, for a good example of use in Android, take a look at [kotlin-components-starter](https://github.com/UnknownJoe796/kotlin-components-starter).
