@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.51'
+    ext.kotlin_version = '1.2.10'
 
     repositories {
         jcenter()
@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.20"
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.26"
     }
 }
 
@@ -43,12 +43,12 @@ jar {
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
-    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMap = false
     kotlinOptions.moduleKind = 'commonjs'
 }
 
 compileTestKotlin2Js {
     kotlinOptions.metaInfo = true
-    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMap = false
     kotlinOptions.moduleKind = 'commonjs'
 }
