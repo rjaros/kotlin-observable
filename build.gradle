@@ -13,6 +13,8 @@ buildscript {
     }
 }
 
+version = '0.0.2'
+
 apply plugin: 'kotlin2js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
 
