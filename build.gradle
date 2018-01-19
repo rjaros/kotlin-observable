@@ -1,5 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.2.10'
+    ext.production = (findProperty('prod') ?: 'false') == 'true'
+    ext.kotlin_version = "1.2.20"
 
     repositories {
         jcenter()
@@ -13,10 +14,16 @@ buildscript {
     }
 }
 
-version = '0.0.2'
+plugins {
+    id "maven-publish"
+    id "com.jfrog.bintray" version "1.7.3"
+}
 
 apply plugin: 'kotlin2js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
+
+group = 'pl.treksoft'
+version = '0.0.3'
 
 repositories {
     mavenCentral()
@@ -36,21 +43,75 @@ kotlinFrontend {
         bundleName = "main"
     }
 
-    define "PRODUCTION", false
+    define "PRODUCTION", production
+}
+
+task cleanLibs(type: Delete) {
+    delete 'build/classes', 'build/libs'
+}
+
+if (project.gradle.startParameter.taskNames.contains("jar")) {
+    compileKotlin2Js.dependsOn 'cleanLibs'
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    excludes = ["package.json"]
 }
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
-    kotlinOptions.sourceMap = false
+    kotlinOptions.sourceMap = !production
     kotlinOptions.moduleKind = 'commonjs'
 }
 
 compileTestKotlin2Js {
     kotlinOptions.metaInfo = true
-    kotlinOptions.sourceMap = false
+    kotlinOptions.sourceMap = !production
     kotlinOptions.moduleKind = 'commonjs'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom.withXml {
+                asNode().dependencies.'*'.findAll() {
+                    it.artifactId.text() == 'kotlin-test-js'
+                }.each() {
+                    it.scope*.value = 'test'
+                }
+            }
+        }
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenPublication {
+        destination = file("$buildDir/libs/${project.name}-${version}.pom")
+    }
+}
+
+bintray {
+    user = findProperty('buser')
+    key = findProperty('bkey')
+    pkg {
+        repo = 'kotlin'
+        name = "${project.name}"
+        licenses = ['MIT']
+        vcsUrl = "https://github.com/rjaros/${project.name}.git"
+        version {
+            name = "${project.version}"
+            desc = 'Observables for Kotlin JavaScript platform.'
+            released = new Date()
+        }
+    }
+    filesSpec {
+        from "${project.buildDir}/libs/"
+        into "pl/treksoft/${project.name}/${project.version}"
+    }
+}
+
+bintrayUpload {
+    dependsOn "generatePomFileForMavenPublication"
 }
