@@ -1,0 +1,33 @@
+def pomConfig = {
+    licenses {
+        license {
+            name "MIT"
+            url "https://opensource.org/licenses/MIT"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "rjaros"
+            name "Robert Jaros"
+            organization "Treksoft"
+            organizationUrl "http://www.treksoft.pl"
+        }
+    }
+
+    scm {
+        url "https://github.com/rjaros/kotlin-observable-js.git"
+    }
+}
+
+def withPom = { pom ->
+    pom.withXml {
+        def root = asNode()
+        root.appendNode('name', project.name)
+        root.appendNode('description', 'Observables for Kotlin JavaScript platform.')
+        root.appendNode('url', 'https://github.com/rjaros/kotlin-observable-js')
+        root.children().last() + pomConfig
+    }
+}
+
+ext.withPom = withPom
